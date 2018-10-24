@@ -1,0 +1,2863 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://wadl.dev.java.net/2009/02">
+    <resources base="https://domain.ca.com:8443">
+        <resource path="/oauth/tokenstore/store" queryType="application/x-www-form-urlencoded">
+            <method id="persist_temporary" name="POST">
+                <doc title="Add a temporary token" xml:lang="en">
+                    <![CDATA[Registers a new temporary token on the OAuth server.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the token, either a request_token (OAuth 1.0) or an authorization_code (OAuth 2.0) to be stored.]]>
+                        </doc>
+                    </param>
+                    <param name="expiration" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the date this token expires (UNIX timestamp in seconds).]]>
+                        </doc>
+                    </param>
+                    <param name="client_key" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the oauth_consumer_key for which this token was issued.]]>
+                        </doc>
+                    </param>
+                    <param name="client_name" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the client name for which this token was issued.]]>
+                        </doc>
+                    </param>
+                    <param name="callback" type="xsd:string" style="query" required="true" default="oob">
+                        <doc xml:lang="en">
+                            <![CDATA[the callback uri. 'redirect_uri' in OAuth 2.0. The parameter may be left empty]]>
+                        </doc>
+                    </param>
+                    <param name="scope" type="xsd:string" style="query" required="true" default="oob">
+                        <doc xml:lang="en">
+                            <![CDATA[the scope used with OAuth 2.0. The parameter may be left empty]]>
+                        </doc>
+                    </param>
+                    <param name="resource_owner" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the resource_owner who granted this token. REQUIRED for OAuth 2.0 (authorization code), OPTIONAL for OAuth 1.0. The request_token is issued without a resource_owner involved.]]>
+                        </doc>
+                    </param>
+                    <param name="secret" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the secret for this token. Optional because OAuth 2.0 does not have a secret if configured to issue BEARER tokens.]]>
+                        </doc>
+                    </param>
+                    <param name="custom" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[A JSON structure containing custom values. This is only supported for OAuth 2.0.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[persisted]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="POST">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="persist_token_oauth1" name="POST">
+                <doc title="Add an oauth_token in the context of OAuth 1.0" xml:lang="en">
+                    <![CDATA[Registers a new OAuth 1.0 token on the OAuth server.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[This API adds the client_name and resource_owner associated with the temp_token.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[This is the oauth_token.]]>
+                        </doc>
+                    </param>
+                    <param name="secret" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the shared secret for this token.]]>
+                        </doc>
+                    </param>
+                    <param name="expiration" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the date this token expires (UNIX timestamp in seconds).]]>
+                        </doc>
+                    </param>
+                    <param name="client_key" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the oauth_consumer_key for which this token was issued. It must match the oauth_consumer_key that has received the temporary token]]>
+                        </doc>
+                    </param>
+                    <param name="status" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[either ENABLED or DISABLED. DISABLED tokens will cause a request to fail.]]>
+                        </doc>
+                    </param>
+                    <param name="temp_token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the temporary token exchanged for this token.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[persisted]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4101103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4101303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="POST">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4101000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="persist_token_oauth2" name="POST">
+                <doc title="Add an access_token/ refresh_token in the context of OAuth 2.0" xml:lang="en">
+                    <![CDATA[Registers a new OAuth 2.0 access_token on the OAuth server. Optionally also a refresh_token.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[This API updates an existing token of the combination 'resource_owner - client_key'. The original token becomes invalid!]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[This is the access_token.]]>
+                        </doc>
+                    </param>
+                    <param name="expiration" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the date this token expires (timestamp in seconds).]]>
+                        </doc>
+                    </param>
+                    <param name="client_key" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the client_id for which this token was issued.]]>
+                        </doc>
+                    </param>
+                    <param name="resource_owner" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the resource_owner who granted this token. For tokens issued via 'client_credentials' flow this should be the client name.]]>
+                        </doc>
+                    </param>
+                    <param name="status" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[either ENABLED or DISABLED. DISABLED tokens will cause a request to fail.]]>
+                        </doc>
+                    </param>
+                    <param name="scope" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the scope that was granted.]]>
+                        </doc>
+                    </param>
+                    <param name="client_name" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the client name for which this token was issued.]]>
+                        </doc>
+                    </param>
+                    <param name="secret" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the shared secret for this token. Not used with token profile 'BEARER'.]]>
+                        </doc>
+                    </param>
+                    <param name="custom" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[A JSON structure containing custom values.]]>
+                        </doc>
+                    </param>
+                    <param name="rtoken" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the refresh token.]]>
+                        </doc>
+                    </param>
+                    <param name="rexpiration" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the date this refresh token expires (timestamp in seconds). This is required if 'rtoken' is provided.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[persisted]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4102103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4102303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="POST">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4102000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/update" queryType="application/x-www-form-urlencoded">
+            <method id="update_token_status" name="PUT">
+                <doc title="Updates token status" xml:lang="en">
+                    <![CDATA[Updates token status on the OAuth server.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the oauth_token or access_token to be updated.]]>
+                        </doc>
+                    </param>
+                    <param name="status" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[either ENABLED or DISABLED. DISABLED tokens will cause a request to fail.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[{no-of-tokens} token(s) updated]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="PUT">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="update_oauth1_token_owner" name="PUT">
+                <doc title="Updates token resource_owner" xml:lang="en">
+                    <![CDATA[Sets the resources_owner associated with the request_token in the context of OAuth 1.0 on the OAuth server.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the OAuth 1.0 request_token after it has been authorized by a resource_owner.]]>
+                        </doc>
+                    </param>
+                    <param name="resource_owner" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the resource_owner who authorized this token.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[{no-of-tokens} token(s) updated]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="PUT,POST">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4104000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="update_oauth1_token_verifier" name="PUT">
+                <doc title="Updates token verifier" xml:lang="en">
+                    <![CDATA[Sets the verifier associated with the request_token in the context of OAuth 1.0 on the OAuth server.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the OAuth 1.0 request_token to receive a verifier.]]>
+                        </doc>
+                    </param>
+                    <param name="expiration" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the date this token expires (timestamp in seconds).]]>
+                        </doc>
+                    </param>
+                    <param name="verifier" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the verifier to to be assigned to the token.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[{no-of-tokens} token(s) updated]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[A verifier for this token has been set already.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103125"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[The verifier is invalid]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="PUT,POST">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4103000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/revoke" queryType="application/x-www-form-urlencoded">
+            <method id="revoke_oauth_token" name="DELETE">
+                <doc title="Revokes a token" xml:lang="en">
+                    <![CDATA[Revokes the given oauth_token/ access_token.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[Valid parameter combinations: either 'token' or 'rtoken' or 'resource_owner' or 'client_key' or 'resource_owner and client_key']]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the oauth_token or access_token to be revoked. MUST be used on its own]]>
+                        </doc>
+                    </param>
+                    <param name="rtoken" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the refresh_token to be revoked. MUST be used on its own]]>
+                        </doc>
+                    </param>
+                    <param name="resource_owner" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the resource_owner whose long-living tokens should all be revoked. Can be used with 'client_key']]>
+                        </doc>
+                    </param>
+                    <param name="client_key" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the client_key of which all temporary and long-living tokens should be revoked. MAY be used with 'resource_owner']]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[{no-of-tokens} token(s) revoked]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4106103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4106303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="DELETE">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4106000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/delete" queryType="application/x-www-form-urlencoded">
+            <method id="delete_oauth_token" name="DELETE">
+                <doc title="Deletes a token" xml:lang="en">
+                    <![CDATA[Deletes the given oauth_token/access_token.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[Only ONE of the parameters can and MUST be used.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the oauth_token or access_token to be deleted.]]>
+                        </doc>
+                    </param>
+                    <param name="rtoken" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the refresh_token to be deleted.]]>
+                        </doc>
+                    </param>
+                    <param name="temp_token" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the temporary token to be deleted.]]>
+                        </doc>
+                    </param>
+                    <param name="client_key" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the client_key of which all temporary and long-living tokens should be deleted.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[{no-of-tokens} token(s) deleted]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4107103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4107303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="DELETE">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4107000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/disable" queryType="application/x-www-form-urlencoded">
+            <method id="disable_oauth_token" name="PUT">
+                <doc title="Disables tokens" xml:lang="en">
+                    <![CDATA[disables all token that were issued to the given client_id.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="client_key" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the client_key of which all long-living tokens should be disabled (status=DISABLED).]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[{no-of-tokens} token(s) disabled]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4108103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4108303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="PUT,POST">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4108000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/get" queryType="application/x-www-form-urlencoded">
+            <method id="get_oauth_token" name="GET">
+                <doc title="Get tokens" xml:lang="en">
+                    <![CDATA[Get the values of tokens.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="offset" type="xsd:string" style="query" required="false" default="0">
+                        <doc xml:lang="en">
+                            <![CDATA[The API returns up to 100 values. This parameter is the query offset which can be used for pagination purposes.]]>
+                        </doc>
+                    </param>
+                    <param name="format" type="xsd:string" style="query" required="false" default="xml">
+                        <doc xml:lang="en">
+                            <![CDATA[Either 'xml' or 'json'. The response is returned in the requested format.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[An XML response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                <values xmlns="http://ns.l7tech.com/2012/11/otk-tokenstore">
+                                    <value index="integer">
+                                        <token>value</token>
+                                        <secret>value</secret>
+                                        <expiration>value</expiration>
+                                        <rtoken>value</rtoken>
+                                        <rexpiration>value</rexpiration>
+                                        <scope>value</scope>
+                                        <resource_owner>. value</resource_owner>
+                                        <client_key>value</client_key>
+                                        <client_name>value</client_name>
+                                        <status>value</status>
+                                        <created>value</created>
+                                        <custom>URL-Encoded-JSON-structure</custom>
+                                    </value>
+                                </values>
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                {"values": {
+                                    "value": [
+                                        {
+                                            "index": 1,
+                                            "client_key": "value",
+                                            "scope": "value",
+                                            "rtoken": "value",
+                                            "created": 1234567890,
+                                            "status": "value",
+                                            "expiration": 1234567890,
+                                            "token": "value",
+                                            "resource_owner": "value",
+                                            "secret": "value",
+                                            "rexpiration": 1234567890,
+                                            "client_name": "value",
+                                            "custom":"{URL-Encoded-JSON-Structure}"
+                                        }
+                                    ]}
+                                }
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="get_oauth_token_param" name="GET">
+                <doc title="Get tokens" xml:lang="en">
+                    <![CDATA[Get the values of tokens selected by value.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[Only one of the parameters can and must be used in addition to 'offset' and 'format'.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the oauth_token or access_token to be retrieved. 'offset' is ignored.]]>
+                        </doc>
+                    </param>
+                    <param name="rtoken" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the refresh_token to be retrieved. 'offset' is ignored.]]>
+                        </doc>
+                    </param>
+                    <param name="resource_owner" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[all tokens that have been granted by this resource_owner.]]>
+                        </doc>
+                    </param>
+                    <param name="client_key" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the client_key of which all long-living tokens should be retrieved.]]>
+                        </doc>
+                    </param>
+                    <param name="status" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[get all tokens with the given status.]]>
+                        </doc>
+                    </param>
+                    <param name="offset" type="xsd:string" style="query" required="false" default="0">
+                        <doc xml:lang="en">
+                            <![CDATA[The API returns up to 100 values. This parameter is the query offset which can be used for pagination purposes.]]>
+                        </doc>
+                    </param>
+                    <param name="format" type="xsd:string" style="query" required="false" default="xml">
+                        <doc xml:lang="en">
+                            <![CDATA[Either 'xml' or 'json'. The response is returned in the requested format.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[An XML response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                <values xmlns="http://ns.l7tech.com/2012/11/otk-tokenstore">
+                                    <value index="integer">
+                                        <token>value</token>
+                                        <secret>value</secret>
+                                        <expiration>value</expiration>
+                                        <rtoken>value</rtoken>
+                                        <rexpiration>value</rexpiration>
+                                        <scope>value</scope>
+                                        <resource_owner>. value</resource_owner>
+                                        <client_key>value</client_key>
+                                        <client_name>value</client_name>
+                                        <status>value</status>
+                                        <created>value</created>
+                                        <custom>URL-Encoded-JSON-structure</custom>
+                                    </value>
+                                </values>
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                {"values": {
+                                    "value": [
+                                        {
+                                            "index": 1,
+                                            "client_key": "value",
+                                            "scope": "value",
+                                            "rtoken": "value",
+                                            "created": 1234567890,
+                                            "status": "value",
+                                            "expiration": 1234567890,
+                                            "token": "value",
+                                            "resource_owner": "value",
+                                            "secret": "value",
+                                            "rexpiration": 1234567890,
+                                            "client_name": "value",
+                                            "custom": {}
+                                        }
+                                    ]}
+                                }
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="get_oauth_token_cid_ro" name="GET">
+                <doc title="Get tokens" xml:lang="en">
+                    <![CDATA[Get the values of tokens selected by client_id and resource_owner.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="resource_owner" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[all tokens that have been granted by this resource_owner.]]>
+                        </doc>
+                    </param>
+                    <param name="client_key" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the client_key of which all long-living tokens should be retrieved.]]>
+                        </doc>
+                    </param>
+                    <param name="format" type="xsd:string" style="query" required="false" default="xml">
+                        <doc xml:lang="en">
+                            <![CDATA[Either 'xml' or 'json'. The response is returned in the requested format.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[An XML response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                <values xmlns="http://ns.l7tech.com/2012/11/otk-tokenstore">
+                                    <value index="integer">
+                                        <token>value</token>
+                                        <secret>value</secret>
+                                        <expiration>value</expiration>
+                                        <rtoken>value</rtoken>
+                                        <rexpiration>value</rexpiration>
+                                        <scope>value</scope>
+                                        <resource_owner>. value</resource_owner>
+                                        <client_key>value</client_key>
+                                        <client_name>value</client_name>
+                                        <status>value</status>
+                                        <created>value</created>
+                                        <custom>URL-Encoded-JSON-structure</custom>
+                                    </value>
+                                </values>
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                {"values": {
+                                    "value": [
+                                        {
+                                            "index": 1,
+                                            "client_key": "value",
+                                            "scope": "value",
+                                            "rtoken": "value",
+                                            "created": 1234567890,
+                                            "status": "value",
+                                            "expiration": 1234567890,
+                                            "token": "value",
+                                            "resource_owner": "value",
+                                            "secret": "value",
+                                            "rexpiration": 1234567890,
+                                            "client_name": "value",
+                                            "custom":"{URL-Encoded-JSON-Structure}"
+                                        }
+                                    ]}
+                                }
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="get_oauth_token_status_ro" name="GET">
+                <doc title="Get tokens" xml:lang="en">
+                    <![CDATA[Get the values of tokens selected by token status and resource_owner.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="resource_owner" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[all tokens that have been granted by this resource_owner.]]>
+                        </doc>
+                    </param>
+                    <param name="status" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[get all tokens with the given status.]]>
+                        </doc>
+                    </param>
+                    <param name="offset" type="xsd:string" style="query" required="false" default="0">
+                        <doc xml:lang="en">
+                            <![CDATA[The API returns up to 100 values. This parameter is the query offset which can be used for pagination purposes.]]>
+                        </doc>
+                    </param>
+                    <param name="format" type="xsd:string" style="query" required="false" default="xml">
+                        <doc xml:lang="en">
+                            <![CDATA[Either 'xml' or 'json'. The response is returned in the requested format.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[An XML response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                <values xmlns="http://ns.l7tech.com/2012/11/otk-tokenstore">
+                                    <value index="integer">
+                                        <token>value</token>
+                                        <secret>value</secret>
+                                        <expiration>value</expiration>
+                                        <rtoken>value</rtoken>
+                                        <rexpiration>value</rexpiration>
+                                        <scope>value</scope>
+                                        <resource_owner>. value</resource_owner>
+                                        <client_key>value</client_key>
+                                        <client_name>value</client_name>
+                                        <status>value</status>
+                                        <created>value</created>
+                                        <custom>URL-Encoded-JSON-structure</custom>
+                                    </value>
+                                </values>
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                {"values": {
+                                    "value": [
+                                        {
+                                            "index": 1,
+                                            "client_key": "value",
+                                            "scope": "value",
+                                            "rtoken": "value",
+                                            "created": 1234567890,
+                                            "status": "value",
+                                            "expiration": 1234567890,
+                                            "token": "value",
+                                            "resource_owner": "value",
+                                            "secret": "value",
+                                            "rexpiration": 1234567890,
+                                            "client_name": "value"
+                                            "custom":"{URL-Encoded-JSON-Structure}"
+                                        }
+                                    ]}
+                                }
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4109000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/getTemp" queryType="application/x-www-form-urlencoded">
+            <method id="get_temporary_token_t" name="GET">
+                <doc title="Get temporary tokens by token and verifier" xml:lang="en">
+                    <![CDATA[Get the values of temporary tokens selected by a token.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the request_token (OAuth 1.0) or authorization_code (OAuth 2.0) to be retrieved.]]>
+                        </doc>
+                    </param>
+                    <param name="format" type="xsd:string" style="query" required="false" default="xml">
+                        <doc xml:lang="en">
+                            <![CDATA[Either 'xml' or 'json'. The response is returned in the requested format.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[An XML response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                <values xmlns="http://ns.l7tech.com/2012/11/otk-tokenstore">
+                                    <value index="integer">
+                                        <token>value</token>
+                                        <secret>value</secret>
+                                        <expiration>value</expiration>
+                                        <scope>value</scope>
+                                        <resource_owner>value</resource_owner>
+                                        <client_key>value</client_key>
+                                        <client_name>value</client_name>
+                                        <created>value</created>
+                                        <callback>value</callback>
+                                        <verifier>value</verifier>
+                                        <custom>URL-Encoded-JSON-structure</custom>
+                                    </value>
+                                </values>
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                {"values": {
+                                    "value": [
+                                        {
+                                            "index": 1,
+                                            "client_key": "value",
+                                            "scope": "value",
+                                            "created": 1234567890,
+                                            "expiration": 1234567890,
+                                            "token": "value",
+                                            "callback": "value",
+                                            "verifier": "value",
+                                            "resource_owner": "value",
+                                            "secret": "value",
+                                            "client_name": "value",
+                                            "custom":"{URL-Encoded-JSON-Structure}"
+                                        }
+                                    ]}
+                                }
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="get_temporary_token_t_v" name="GET">
+                <doc title="Get temporary tokens by token and verifier" xml:lang="en">
+                    <![CDATA[Get the values of temporary tokens selected by token and optional verifier. This is valid in the context of OAuth 1.0]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <param name="token" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the authorized request_token.]]>
+                        </doc>
+                    </param>
+                    <param name="verifier" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the verifier issued for the token.]]>
+                        </doc>
+                    </param>
+                    <param name="format" type="xsd:string" style="query" required="false" default="xml">
+                        <doc xml:lang="en">
+                            <![CDATA[Either 'xml' or 'json'. The response is returned in the requested format.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[An XML response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                <values xmlns="http://ns.l7tech.com/2012/11/otk-tokenstore">
+                                    <value index="integer">
+                                        <token>value</token>
+                                        <secret>value</secret>
+                                        <expiration>value</expiration>
+                                        <scope>value</scope>
+                                        <resource_owner>. value</resource_owner>
+                                        <client_key>value</client_key>
+                                        <client_name>value</client_name>
+                                        <created>value</created>
+                                        <callback>value</callback>
+                                        <verifier>value</verifier>
+                                        <custom>URL-Encoded-JSON-structure</custom>
+                                    </value>
+                                </values>
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                {"values": {
+                                    "value": [
+                                        {
+                                            "index": 1,
+                                            "client_key": "value",
+                                            "scope": "value",
+                                            "created": 1234567890,
+                                            "expiration": 1234567890,
+                                            "token": "value",
+                                            "callback": "value",
+                                            "verifier": "value",
+                                            "resource_owner": "value",
+                                            "secret": "value",
+                                            "client_name": "value",
+                                            "custom":"{URL-Encoded-JSON-Structure}"
+                                        }
+                                    ]}
+                                }
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+            <method id="get_temporary_token_cid_ro" name="GET">
+                <doc title="DEPRECATED: Get temporary tokens by client_id and resource_owner" xml:lang="en">
+                    <![CDATA[Get the values of temporary tokens selected by client_id and resource_owner.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[This request only returns a result if any temporary token issued has not been used. Usually this table is empty since clients exchange the temporary token for a long living token immediately.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[This API accepts 'client_key' or 'resource_owner' or both at once. One has to be used at least.]]>
+                    </doc>
+                    <param name="client_key" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the oauth_consumer_key (OAuth 1.0) or client_id (OAuth 2.0) of which all temporary tokens should be retrieved. This can be used without 'resource_owner'.]]>
+                        </doc>
+                    </param>
+                    <param name="resource_owner" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[all tokens that have been granted by this resource_owner. This can be used without 'client_key'.]]>
+                        </doc>
+                    </param>
+                    <param name="format" type="xsd:string" style="query" required="false" default="xml">
+                        <doc xml:lang="en">
+                            <![CDATA[Either 'xml' or 'json'. The response is returned in the requested format.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[An XML response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                <values xmlns="http://ns.l7tech.com/2012/11/otk-tokenstore">
+                                    <value index="integer">
+                                        <token>value</token>
+                                        <secret>value</secret>
+                                        <expiration>value</expiration>
+                                        <scope>value</scope>
+                                        <resource_owner>. value</resource_owner>
+                                        <client_key>value</client_key>
+                                        <client_name>value</client_name>
+                                        <created>value</created>
+                                        <callback>value</callback>
+                                        <verifier>value</verifier>
+                                        <custom>URL-Encoded-JSON-structure</custom>
+                                    </value>
+                                </values>
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                {"values": {
+                                    "value": [
+                                        {
+                                            "index": 1,
+                                            "client_key": "value",
+                                            "scope": "value",
+                                            "created": 1234567890,
+                                            "expiration": 1234567890,
+                                            "token": "value",
+                                            "callback": "value",
+                                            "verifier": "value",
+                                            "resource_owner": "value",
+                                            "secret": "value",
+                                            "client_name": "value",
+                                            "custom":"{URL-Encoded-JSON-Structure}"
+                                        }
+                                    ]}
+                                }
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4110000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/jwt_register" queryType="application/x-www-form-urlencoded">
+            <method id="register_jwt" name="POST">
+                <doc title="Registers a new JWT (id_token)" xml:lang="en">
+                    <![CDATA[Registers a new JWT (id_token) on the OAuth server.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[The API will replace/update an existing JWT if the combination of 'resource_owner - azp' already exists in the case of an id_token.]]>
+                    </doc>
+                    <param name="resource_owner" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the resource_owner for whom this token was issued.]]>
+                        </doc>
+                    </param>
+                    <param name="azp" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[a single value or space-separated list of valid users for this token.]]>
+                        </doc>
+                    </param>
+                    <param name="iss" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the issuing server URL, such as: server.ca.com.]]>
+                        </doc>
+                    </param>
+                    <param name="jwt" type="xsd:string" style="query" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the complete JWT.]]>
+                        </doc>
+                    </param>
+                    <param name="sub" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the 'sub'ject if the JWT is an id_token.]]>
+                        </doc>
+                    </param>
+                    <param name="salt" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the salt value used to generate the 'sub'ject value if the JWT is an id_token.]]>
+                        </doc>
+                    </param>
+                    <param name="shared_secret" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the shared secret used to sign the JWT.]]>
+                        </doc>
+                    </param>
+                    <param name="shared_secret_type" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the shared secret type used to sign the JWT. For example, the algorithm that was used: 'HS256'.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[persisted]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4111103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4111303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="POST">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4111000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/jwt_lookup" queryType="application/x-www-form-urlencoded">
+            <method id="lookup_jwt" name="GET">
+                <doc title="Looks up a JWT (id_token)" xml:lang="en">
+                    <![CDATA[Looks up a JWT (id_token) from the OAuth server.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[The API will return a JWT based on given parameters.]]>
+                    </doc>
+                    <param name="jwt" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the complete JWT. This parameter has to be used o its own if it is used!]]>
+                        </doc>
+                    </param>
+                    <param name="azp" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[a single or space separated list of valid users for this token. This parameter MUST be used with 'sub' or 'resource_owner'.]]>
+                        </doc>
+                    </param>
+                    <param name="sub" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the 'sub'ject if the JWT is an id_token. This parameter MUST be used with 'azp']]>
+                        </doc>
+                    </param>
+                    <param name="resource_owner" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the resource_owner for whom this token was issued. This parameter MUST be used with 'azp']]>
+                        </doc>
+                    </param>
+                    <param name="format" type="xsd:string" style="query" required="false" default="xml">
+                        <doc xml:lang="en">
+                            <![CDATA[Either 'xml' or 'json'. The response is returned in the requested format.]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[An XML response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                <values xmlns="http://ns.l7tech.com/2012/11/otk-tokenstore">
+                                    <value index="integer">
+                                        <resource_owner>value</resource_owner>
+                                        <azp>value</azp>
+                                        <iss>value</iss>
+                                        <expiration>value</expiration>
+                                        <jwt>value</jwt>
+                                        <sub>value</sub>
+                                        <jwt_id>value</jwt_id>
+                                        <salt>value</salt>
+                                        <shared_secret>value</shared_secret>
+                                        <shared_secret_type>value</shared_secret_type>
+                                    </value>
+                                </values>
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON response that includes the element 'values'. 'value' appears once, multiple times, or not at all (indicating no values found).]]>
+                    </doc>
+                    <representation mediaType="text/xml;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                                {"values": {
+                                    "value": {
+                                        "sub": "value",
+                                        "resource_owner": "value",
+                                        "salt": "value",
+                                        "shared_secret_type": "value",
+                                        "azp": "value",
+                                        "jwt": "value",
+                                        "jwt_id": "value",
+                                        "iss": "value",
+                                        "index": integer,
+                                        "shared_secret": "value",
+                                        "expiration": value
+                                    }
+                                }}
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4112103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4112303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4112000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+        <resource path="/oauth/tokenstore/jwt_removal" queryType="application/x-www-form-urlencoded">
+            <method id="remove_jwt" name="DELETE">
+                <doc title="Removes up a JWT (id_token)" xml:lang="en">
+                    <![CDATA[Removes a JWT (id_token) from the OAuth server.]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication is done via ssl mutual authentication.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[Only one of the parameters can be and has to be used in addition to 'logout_apps'.]]>
+                    </doc>
+                    <param name="jwt" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the complete JWT.]]>
+                        </doc>
+                    </param>
+                    <param name="azp" type="xsd:string" style="query" required="false" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[the azp value.]]>
+                        </doc>
+                    </param>
+                    <param name="logout_apps" type="xsd:string" style="query" required="false" default="false">
+                        <doc xml:lang="en">
+                            <![CDATA[[MAG]: if set to 'true', all oauth token issued to 'azp' will be removed. This parameter is valid in the context of MAG and Mobile SSO only!]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <representation mediaType="text/plain">
+                        <doc xml:lang="en">
+                            <![CDATA[removed]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[If any required parameters or headers are missing, the request will fail.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4113103"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Missing or unknown parameters"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="400">
+                    <doc xml:lang="en">
+                        <![CDATA[The path component is invalid.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4113303"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The path component of the URL is invalid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Authentication failed.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100204"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL with client authentication is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The client could not be authenticated.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4100205"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"The client certificate is not valid"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="DELETE">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and contains a comma separated list of valid HTTP methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="4113000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+    </resources>
+</application>

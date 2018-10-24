@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns="http://wadl.dev.java.net/2009/02">
+    <resources base="https://domain.ca.com:8443">
+        <resource path="/openid/connect/v1/userinfo" queryType="application/x-www-form-urlencoded">
+            <method id="userinfo" name="GET">
+                <doc title="Userinfo" xml:lang="en">
+                    <![CDATA[This API reflects an implementation according to OpenID Connect. For more information refer to this website: http://openid.net/specs/openid-connect-core-1_0.html#UserInfo]]>
+                </doc>
+                <request>
+                    <doc xml:lang="en">
+                        <![CDATA[This endpoint returns a message with user details. The content depends on the SCOPE associated with the given access_token.]]>
+                    </doc>
+                    <doc xml:lang="en">
+                        <![CDATA[IMPORTANT: The API will fail if not active id_token is available for the associated user.]]>
+                    </doc>
+                    <param name="authorization" type="xsd:string" style="header" required="true" default="">
+                        <doc xml:lang="en">
+                            <![CDATA[A valid access_token (e.g.: authorization: Bearer access-token-value)]]>
+                        </doc>
+                        <doc xml:lang="en">
+                            <![CDATA[The access_token has to be SCOPE'd for at least 'openid'. Other valid SCOPE values are: 'email', 'address', 'phone', 'profile'. In addition to those SCOPE values 'user_role' is also supported. That SCOPE is an extension for OTK/MAG and returns the role of the user]]>
+                        </doc>
+                    </param>
+                </request>
+                <response status="200">
+                    <doc xml:lang="en">
+                        <![CDATA[A JSON message containing details about the user. The content depends on the SCOPE associated with the access_token.]]>
+                    </doc>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[{
+                                       "sub": "248289761001",
+                                       "name": "Jane Doe",
+                                       "given_name": "Jane",
+                                       "family_name": "Doe",
+                                       "preferred_username": "j.doe",
+                                       "email": "janedoe@example.com",
+                                       "picture": "http://example.com/janedoe/me.jpg"
+                                     }
+                            ]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="401">
+                    <doc xml:lang="en">
+                        <![CDATA[The given token is not valid. The error code may be 990, 991, 992, 993]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="990"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"Validation error"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="403">
+                    <doc xml:lang="en">
+                        <![CDATA[Forbidden.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="203"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                    <representation mediaType="application/json;charset=UTF-8">
+                        <doc xml:lang="en">
+                            <![CDATA[
+                            {
+                              "error":"invalid_request",
+                              "error_description":"SSL is required"
+                            }]]>
+                        </doc>
+                    </representation>
+                </response>
+                <response status="405">
+                    <doc xml:lang="en">
+                        <![CDATA[The HTTP method is not valid]]>
+                    </doc>
+                    <param name="Allow" type="xsd:string" style="header" required="true" default="GET, POST">
+                        <doc xml:lang="en">
+                            <![CDATA[This header is required by RFC 2616 and will contain a comma separated list of valid http methods.]]>
+                        </doc>
+                    </param>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+                <response status="500">
+                    <doc xml:lang="en">
+                        <![CDATA[Unknown error. This will also occur if the user does not have an active session, id_token, on the server.]]>
+                    </doc>
+                    <param name="x-ca-err" type="xsd:string" style="header" required="true" default="000"/>
+                    <param name="Pragma" type="xsd:string" style="header" required="true" default="no-cache"/>
+                    <param name="Cache-Control" type="xsd:string" style="header" required="true" default="no-store"/>
+                </response>
+            </method>
+        </resource>
+    </resources>
+</application>
